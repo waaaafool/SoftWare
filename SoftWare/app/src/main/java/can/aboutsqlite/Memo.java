@@ -121,7 +121,9 @@ public class Memo {
         return memo_dtime;
     }
 
-
+    public void setMemo_dtimestring(String memo_dtime){
+        this.memo_dtime=memo_dtime;
+    }
     public void setMemo_dtime(long memo_dtime) {
         Date date = new Date(memo_dtime);
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -42,18 +42,6 @@ public class MainActivity extends AppCompatActivity {
         gData.add(new Group_new("已完成任务",0));
 
         //插入测试数据
-        Memo memo = new Memo("明天有博客",
-                "2018-11-14 23:00:00",2,0,0,
-                0, 1,1,0,"：）");
-        Memo memo1 = new Memo("明天有博客",
-                "2018-11-13 23:00:00",2,0,0,
-                0, 1,1,1,"：）");
-        Memo memo2 = new Memo("明天有博客",
-                "2018-11-13 23:00:00",2,0,0,
-                0, 1,1,0,"：）");
-        mgr.insert_Memo(memo);mgr.insert_Memo(memo);mgr.insert_Memo(memo);mgr.insert_Memo(memo);mgr.insert_Memo(memo);
-        mgr.insert_Memo(memo1);mgr.insert_Memo(memo1);mgr.insert_Memo(memo1);mgr.insert_Memo(memo1);mgr.insert_Memo(memo1);
-        mgr.insert_Memo(memo2);mgr.insert_Memo(memo2);mgr.insert_Memo(memo2);mgr.insert_Memo(memo2);mgr.insert_Memo(memo2);
 
         //待完成组
         lData = new ArrayList<Memo>();

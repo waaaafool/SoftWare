@@ -1,52 +1,32 @@
 package can.memorycan.memo_add;
-
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.Activity;
-import android.os.Bundle;
-import android.view.View;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 import can.aboutsqlite.*;
 import can.main_delete.MainActivity;
 import can.memorycan.memo_add.clock.widget.CustomDatePicker;
-import android.widget.AdapterView.OnItemSelectedListener;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
-
 import can.memorycan.R;
-
 import java.util.ArrayList;
-
-import can.memorycan.R;
 import can.memorycan.memo_add.list_View.Group;
 import can.memorycan.memo_add.list_View.Item;
 import can.memorycan.memo_add.list_View.MyBaseExpandableListAdapter;
-import can.memorycan.memo_add.clock.Clock;
 public class memo_add extends AppCompatActivity{
     /*定义控件变量*/
     private RelativeLayout selectDate, selectTime;
@@ -62,14 +42,17 @@ public class memo_add extends AppCompatActivity{
     private Button memo_add_save;
     private ExpandableListView exlist_lol;
     private MyBaseExpandableListAdapter myAdapter = null;
+    private Memo temp_memo;
     private DBManager mgr;
     public int x=-1,y=-1;
+
 
     /*创建Memo所需的变量*/
     int memo_id;
     String memo_title;
+    String s[];
     String memo_ctime="now";
-    String memo_dtime;
+    String memo_dtime="";
     int memo_priority;
     int memo_periodicity;
     int memo_advanced;
@@ -78,6 +61,15 @@ public class memo_add extends AppCompatActivity{
     int user_id;
     int memo_done;
     String memo_content;
+    String first[]={"无","每周","每15天","每个月"};
+    String second[]={"不提醒","提前十分钟","提前30分钟","提前1小时"};
+    String thrid[]={"不提醒","闹钟","震动","闹钟加震动"};
+    String fourth[]={"否","是"};
+
+    String temp_str[]={"无","不提醒","不提醒","否"};
+    String temp_str1[]=temp_str;
+
+    int n;
 
 
     @Override
@@ -87,16 +79,29 @@ public class memo_add extends AppCompatActivity{
         mContext = memo_add.this;
         /*创建DATABASE*/
         mgr = new DBManager(this);
+        temp_memo=new Memo();
+
 
         /*判断是更新memo还是创建新的memo*/
-        Intent it=getIntent();
+       /* Intent it=getIntent();
         Bundle bd=it.getExtras();
-        int n=bd.getInt("Flag");
+        int n=bd.getInt("Flag");*/
+        n=214;
 
-        Memo temp_memo=mgr.returnamemo(n);
+        editMemoTitle=findViewById(R.id.memo_add_title);
+        //   editMemoTitle.setOnClickListener(new class_addTitle());
+        if(n!=1){
+            temp_memo=mgr.returnamemo(n);
+            editMemoTitle.setText(temp_memo.getMemo_title());
+
+        }
+
 
         currentDate = (TextView) findViewById(R.id.currentDate);
         currentTime = (TextView) findViewById(R.id.currentTime);
+
+
+
 
         exlist_lol =  findViewById(R.id.exlist_lol);
         /*建立监听事件*/
@@ -111,8 +116,7 @@ public class memo_add extends AppCompatActivity{
         memo_add_save=(Button)findViewById(R.id.memo_add_save);
         memo_add_save.setOnClickListener(new to_main());
 
-        editMemoTitle=findViewById(R.id.memo_add_title);
-        editMemoTitle.setOnClickListener(new class_addTitle());
+
 
         spinMoreSetting=findViewById(R.id.memo_add_priority);
 
@@ -153,16 +157,14 @@ public class memo_add extends AppCompatActivity{
             }
         });
 
+        if(n!=-1){
+            currentTime.setText(temp_memo.getmemo_dtimestring());
+        }
+        else {
+            String SSSS="3000-01-01 00:00:00";
+            currentTime.setText(SSSS);
+        }
 
-       /* exlist_lol.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-            @Override
-            public boolean onChildClick(ExpandableListView parent, View v, int groupPosition, int childPosition, long id) {
-                Toast.makeText(mContext, "你点击了：" + iData.get(groupPosition).get(childPosition).getiName(), Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });*/
-
-       /* exlist_lol.setOnChildClickListener((ExpandableListView.OnChildClickListener) this);*/
 
         initDatePicker();
 
@@ -190,68 +192,39 @@ public class memo_add extends AppCompatActivity{
         lData.add(new Item(R.drawable.icon_small_picture,"是否显示在锁屏",_Adapter3));
         iData.add(lData);
 
+        if(n!=-1) {
+            if (temp_memo.getMemo_periodicity() == 0) temp_str1[0] = "无";
+            else if (temp_memo.getMemo_periodicity() == 1) temp_str1[0] = "每周";
+            else if (temp_memo.getMemo_periodicity() == 2) temp_str1[0] = "每15天";
+            else if (temp_memo.getMemo_periodicity() == 3) temp_str1[0] = "每个月";
+
+            if (temp_memo.getMemo_advanced() == 0) temp_str1[1] = "不提醒";
+            else if (temp_memo.getMemo_advanced() == 10) temp_str1[1] = "提前十分钟";
+            else if (temp_memo.getMemo_advanced() == 30) temp_str1[1] = "提前30分钟";
+            else if (temp_memo.getMemo_advanced() == 60) temp_str1[1] = "提前1小时";
+
+            if (temp_memo.getMemo_remind() == 0) temp_str1[2] = "不提醒";
+            else if (temp_memo.getMemo_remind() == 1) temp_str1[2] = "闹铃";
+            else if (temp_memo.getMemo_remind() == 2) temp_str1[2] = "震动";
+            else if (temp_memo.getMemo_remind() == 3) temp_str1[2] = "闹铃加震动";
+
+            if(temp_memo.getMemo_paper()==0) temp_str1[3]="否";
+            else temp_str1[3]="是";
+
+        }
 
         //将Adapter加入方法创建myAdapter类
         myAdapter = new MyBaseExpandableListAdapter(gData,iData,mContext);
         exlist_lol.setAdapter(myAdapter);
 
         //默认的spinner的值
-        String temp_str[]={"无","不提醒","不提醒","否"};
+        myAdapter.setSet_spinner(temp_str1);
 
+        s=myAdapter.sp_display();
 
-        //已有储存的
-        String temp_str1[]=temp_str;
-        if(temp_memo.getMemo_periodicity()==0) temp_str1[0]="不提醒";
-        else if(temp_memo.getMemo_periodicity()==10) temp_str1[0]="提前十分钟";
-        else if(temp_memo.getMemo_periodicity()==30) temp_str1[0]="提前30分钟";
-        else if(temp_memo.getMemo_periodicity()==60) temp_str1[0]="提前1小时";
-
-        if(temp_memo.getMemo_advanced()==0) temp_str1[1]="不提醒";
-        else if(temp_memo.getMemo_advanced()==10) temp_str1[1]="提前十分钟";
-        else if(temp_memo.getMemo_advanced()==30) temp_str1[1]="提前30分钟";
-        else if(temp_memo.getMemo_advanced()==60) temp_str1[1]="提前1小时";
-
-        if(temp_memo.getMemo_remind()==0) temp_str1[1]="不提醒";
-        else if(temp_memo.getMemo_remind()==1) temp_str1[1]="闹铃";
-        else if(temp_memo.getMemo_remind()==2) temp_str1[1]="震动";
-        else if(temp_memo.getMemo_remind()==3) temp_str1[1]="闹铃加震动";
-
-
-        if(temp_memo.getMemo_paper()==0) temp_str1[4]="否";
-        else if(temp_memo.getMemo_paper()==0) temp_str1[4]="是";
-        //myAdapter.setFlag(1);
-        if(n==-1) {
-            myAdapter.setSet_spinner(temp_str);
-        }
-
-        String s[]=myAdapter.sp_display();
-        if(s[0]=="不提醒") memo_periodicity=0;
-        else if(s[0]=="提前十分钟") memo_periodicity=10;
-        else if(s[0]=="提前30分钟") memo_periodicity=30;
-        else if(s[0]=="提前1小时")  memo_periodicity=60;
-
-        if(s[1]=="不提醒") memo_advanced=0;
-        else if(s[1]=="提前十分钟") memo_advanced=10;
-        else if(s[1]=="提前30分钟") memo_advanced=30;
-        else if(s[1]=="提前1小时")  memo_advanced=60;
-
-        if(s[2]=="不提醒") memo_remind=0;
-        else if(s[2]=="闹钟") memo_remind=10;
-        else if(s[2]=="震动") memo_remind=30;
-        else if(s[2]=="闹钟加震动")  memo_remind=60;
-
-        if(s[3]=="否") memo_paper=0;
-        else if(s[3]=="是") memo_paper=1;
-
-        /*如果不是更新,设置标题*/
-        if(n!=-1)  editMemoTitle.setText(temp_memo.getMemo_title());
-
-        //构建memo
-        user_id=123;
-        memo_done=1;
-        memo_content="15315";
-        Memo final_memo=new Memo(memo_title, memo_dtime,memo_priority,memo_periodicity,memo_advanced,memo_remind,memo_paper,user_id,memo_done,memo_content);
-        mgr.update_Memo(final_memo);
+        user_id=1;
+        memo_done=0;
+        memo_content="a我是中国人5";
 
     }
 
@@ -259,7 +232,7 @@ public class memo_add extends AppCompatActivity{
     private class class_addTitle implements View.OnClickListener{
         @Override
         public void onClick(View v) {
-            Toast.makeText(mContext, "你点击了：memo_add_title" , Toast.LENGTH_SHORT).show();
+            Toast.makeText(mContext, s[0].equals(first[1])+memo_content+"  "+memo_dtime+"  "+memo_title+"  "+memo_priority+"  "+memo_remind+"  "+memo_periodicity+"  "+memo_paper+"  "+memo_advanced+"  "+s[0]+s[1]+s[2]+s[3], Toast.LENGTH_SHORT).show();
             memo_title=editMemoTitle.getText().toString();
         }
     }
@@ -277,15 +250,50 @@ public class memo_add extends AppCompatActivity{
     private class to_main implements View.OnClickListener{
         @Override
         public void onClick(View v) {
+
             Intent intent=new Intent(memo_add.this,MainActivity.class);
             startActivity(intent);
+            memo_title=editMemoTitle.getText().toString();
+            memo_dtime=currentTime.getText().toString()+":00";
+
+            if(s[0].equals(first[0])) memo_periodicity=0;
+            else if(s[0].equals(first[1])) memo_periodicity=1;
+            else if(s[0].equals(first[2])) memo_periodicity=2;
+            else if(s[0].equals(first[3]))  memo_periodicity=3;
+
+            if(s[1].equals(second[0])) memo_advanced=0;
+            else if(s[1].equals(second[1])) memo_advanced=10;
+            else if(s[1].equals(second[2])) memo_advanced=30;
+            else if(s[1].equals(second[3]))  memo_advanced=60;
+
+            if(s[2].equals(thrid[0])) memo_remind=0;
+            else if(s[2].equals(thrid[1])) memo_remind=1;
+            else if(s[2].equals(thrid[2])) memo_remind=2;
+            else if(s[2].equals(thrid[3]))  memo_remind=3;
+
+            if(s[3].equals(fourth[0])) memo_paper=0;
+            else if(s[3].equals(fourth[1])) memo_paper=1;
+            if(n!=-1){
+                temp_memo.setMemo_content(memo_content);
+                temp_memo.setMemo_advanced(memo_advanced);
+                temp_memo.setMemo_paper(memo_paper);
+                temp_memo.setMemo_dtimestring(memo_dtime);
+                temp_memo.setMemo_periodicity(memo_periodicity);
+                temp_memo.setMemo_priority(memo_priority);
+                temp_memo.setMemo_title(memo_title);
+                mgr.update_Memo(temp_memo);
+            }
+            else{
+                Memo final_memo=new  Memo(memo_title,memo_dtime,memo_priority,memo_periodicity, memo_advanced,memo_remind,memo_paper,user_id,memo_done,memo_content);
+                mgr.insert_Memo(final_memo);
+            }
+
         }
     }
     private  class class_selectTime implements View.OnClickListener{
         @Override
         public void onClick(View v) {
             customDatePicker2.show(currentTime.getText().toString());
-            memo_dtime=currentTime.getText().toString()+":00";
             Toast.makeText(mContext, "你点击了：" +currentTime.getText().toString(), Toast.LENGTH_SHORT).show();
         }
     }
@@ -294,7 +302,7 @@ public class memo_add extends AppCompatActivity{
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA);
         String now = sdf.format(new Date());
         currentDate.setText(now.split(" ")[0]);
-        currentTime.setText(now);
+        //currentTime.setText(now);
 
         customDatePicker1 = new CustomDatePicker(this, new CustomDatePicker.ResultHandler() {
             @Override

@@ -47,6 +47,8 @@ public class MyBaseExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
 
+
+
         @Override
     public int getGroupCount() {
         return gData.size();
@@ -168,7 +170,7 @@ public class MyBaseExpandableListAdapter extends BaseExpandableListAdapter {
     private static class ViewHolderItem{
         private ImageView img_icon;
         private TextView tv_name;
-        private Spinner Sp;
+        public Spinner Sp;
 
     }
 
